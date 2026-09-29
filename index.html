@@ -55,8 +55,66 @@ button,.button{font:inherit}.action,.secondary{width:100%;min-height:60px;border
 const $=id=>document.getElementById(id), botao=$('foto'),arquivo=$('arquivo'),status=$('status'),processando=$('processando'),config=$('config'),resultado=$('resultado'),grade=$('grade');
 let numeros=[], centroLivre=false, marcados=new Set(), quinaAnunciada=false, partida={premio:'',linhas:[],centroConta:false};
 function anunciar(msg){status.textContent='';setTimeout(()=>status.textContent=msg,40)}
-function extrairNumeros(t){const v=(t.match(/\b(?:[1-9]|[1-6]\d|7[0-5])\b/g)||[]).map(Number),u=[];for(const n of v)if(!u.includes(n))u.push(n);return u.slice(0,25)}
-function detectarCentroLivre(texto,nums){return /\b(FREE|LIVRE)\b/i.test(texto)||nums.length===24}
+function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
+let ocrWorker=null;
+async function carregarOCR(){
+  if(ocrWorker)return ocrWorker;
+  processando.textContent='Preparando o reconhecimento pela primeira vez…';
+  ocrWorker=await Tesseract.createWorker('eng',1,{logger:m=>{
+    if(m.status==='recognizing text'){
+      const p=Math.round((m.progress||0)*100);
+      processando.textContent=`Reconhecendo a cartela: ${p}%`;
+    }
+  }});
+  await ocrWorker.setParameters({
+    tessedit_char_whitelist:'0123456789',
+    tessedit_pageseg_mode:'6',
+    preserve_interword_spaces:'1'
+  });
+  return ocrWorker;
+}
+async function prepararImagem(file){
+  const bmp=await createImageBitmap(file);
+  const max=1600, scale=Math.min(1,max/Math.max(bmp.width,bmp.height));
+  const w=Math.max(1,Math.round(bmp.width*scale)),h=Math.max(1,Math.round(bmp.height*scale));
+  const c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d',{willReadFrequently:true});
+  x.drawImage(bmp,0,0,w,h);bmp.close?.();
+  const im=x.getImageData(0,0,w,h),d=im.data,hist=new Uint32Array(256);let total=w*h,sum=0;
+  for(let i=0;i<d.length;i+=4){const g=Math.round(.299*d[i]+.587*d[i+1]+.114*d[i+2]);hist[g]++;sum+=g}
+  let sumB=0,wB=0,maxVar=0,thr=150;
+  for(let t=0;t<256;t++){wB+=hist[t];if(!wB)continue;const wF=total-wB;if(!wF)break;sumB+=t*hist[t];const mB=sumB/wB,mF=(sum-sumB)/wF,v=wB*wF*(mB-mF)*(mB-mF);if(v>maxVar){maxVar=v;thr=t}}
+  thr=clamp(thr,85,205);
+  for(let i=0;i<d.length;i+=4){const g=Math.round(.299*d[i]+.587*d[i+1]+.114*d[i+2]);const v=g<thr?0:255;d[i]=d[i+1]=d[i+2]=v;d[i+3]=255}
+  x.putImageData(im,0,0);return c;
+}
+function numeroValido(s){const m=String(s||'').match(/\d{1,3}/);if(!m)return null;const n=Number(m[0]);return n>=1&&n<=100?n:null}
+function dadosPalavras(data){
+  const ws=data.words||data.blocks?.flatMap(b=>b.paragraphs||[]).flatMap(p=>p.lines||[]).flatMap(l=>l.words||[])||[];
+  return ws.map(w=>({n:numeroValido(w.text),conf:Number(w.confidence??w.conf??0),box:w.bbox})).filter(w=>w.n&&w.box&&w.conf>=20);
+}
+function agrupar5(vals){
+  if(!vals.length)return null;const a=[...vals].sort((x,y)=>x-y),groups=[];
+  for(const v of a){let g=groups.find(z=>Math.abs(z.mean-v)<z.tol);if(!g){g={items:[],mean:v,tol:Math.max(18,(a[a.length-1]-a[0])/12)};groups.push(g)}g.items.push(v);g.mean=g.items.reduce((q,n)=>q+n,0)/g.items.length}
+  while(groups.length>5){let bi=0,bd=Infinity;for(let i=0;i<groups.length-1;i++){const d=groups[i+1].mean-groups[i].mean;if(d<bd){bd=d;bi=i}}const m=groups.splice(bi,2);groups.splice(bi,0,{items:[...m[0].items,...m[1].items],mean:(m[0].mean+m[1].mean)/2,tol:Math.max(m[0].tol,m[1].tol)})}
+  return groups.sort((x,y)=>x.mean-y.mean).map(g=>g.mean);
+}
+function mapearGrade(words){
+  if(words.length<20)return null;
+  const xs=words.map(w=>(w.box.x0+w.box.x1)/2),ys=words.map(w=>(w.box.y0+w.box.y1)/2),cols=agrupar5(xs),rows=agrupar5(ys);
+  if(!cols||!rows||cols.length!==5||rows.length!==5)return null;
+  const cells=Array(25).fill(null),confidence=Array(25).fill(0);
+  const near=(arr,v)=>arr.reduce((best,x,i)=>Math.abs(x-v)<best.d?{i,d:Math.abs(x-v)}:best,{i:0,d:Infinity}).i;
+  for(const w of words){const cx=(w.box.x0+w.box.x1)/2,cy=(w.box.y0+w.box.y1)/2,c=near(cols,cx),r=near(rows,cy),i=r*5+c;if(w.conf>confidence[i]){cells[i]=w.n;confidence[i]=w.conf}}
+  return {cells,confidence};
+}
+function validarLeitura(mapped){
+  if(!mapped)return {ok:false,msg:'Não consegui localizar com segurança a grade 5 por 5. Fotografe a cartela inteira, de frente, evitando inclinação.'};
+  const c=mapped.cells,externas=c.filter((_,i)=>i!==12),faltas=externas.filter(n=>!n).length;
+  if(faltas)return {ok:false,msg:`Não consegui ler ${faltas} ${faltas===1?'casa':'casas'} da cartela. A leitura não será aceita para evitar números errados. Tente outra foto.`};
+  const nums=externas.slice();let livre=!c[12];if(!livre)nums.splice(12,0,c[12]);
+  if(new Set(nums).size!==nums.length)return {ok:false,msg:'Encontrei números repetidos na leitura. Para evitar uma cartela incorreta, fotografe novamente.'};
+  return {ok:true,numeros:nums,centroLivre:livre};
+}
 function beep(vezes=1,freq=620,dur=.09){try{const C=window.AudioContext||window.webkitAudioContext,ctx=new C();for(let i=0;i<vezes;i++){const o=ctx.createOscillator(),g=ctx.createGain();o.frequency.value=freq;o.connect(g);g.connect(ctx.destination);const t=ctx.currentTime+i*.16;g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.16,t+.015);g.gain.exponentialRampToValueAtTime(.0001,t+dur);o.start(t);o.stop(t+dur+.02)}setTimeout(()=>ctx.close(),1000)}catch(e){}}
 function somQuina(){beep(2,880,.14)} function somCompleto(){beep(3,1040,.18)}
 function abrirConfig(){processando.hidden=true;botao.hidden=true;$('intro').hidden=true;config.hidden=false;$('tituloConfig').focus();anunciar('Cartela reconhecida. Configure a partida.')}
@@ -71,5 +129,5 @@ function linhasValidas(cs){const L=[];if(partida.linhas.includes('horizontal'))f
 function progresso(){const total=numeros.length, m=marcados.size, faltam=total-m;$('contagem').textContent=`Marcados: ${m}. Restam: ${faltam}.`;$('meta').textContent=partida.premio==='quina-cheia'?(quinaAnunciada?' Quina concluída; partida continua para cartela cheia.':' Objetivo atual: quina.'):' Objetivo: cartela cheia.';if(partida.premio==='quina-cheia'&&!quinaAnunciada&&linhasValidas(casas()).length){quinaAnunciada=true;somQuina();anunciar('Quina completa. A partida continua para cartela cheia.');return}if(faltam===0){somCompleto();anunciar('Cartela completa. Confira o resultado.');return}if(faltam<=3){beep(faltam);anunciar(`Faltam ${faltam} ${faltam===1?'número':'números'} para completar a cartela.`)}}
 function montarCartela(){grade.innerHTML='';marcados.clear();quinaAnunciada=false;const cs=casas();cs.forEach((x,i)=>{if(x.livre){const d=document.createElement('div');d.className='free';d.textContent='LIVRE';d.setAttribute('aria-label','Casa central livre');grade.appendChild(d);return}const b=document.createElement('button');b.type='button';b.className='num';b.textContent=x.n;b.setAttribute('aria-pressed','false');b.setAttribute('aria-label',`Número ${x.n}, não marcado`);b.addEventListener('click',()=>{const on=b.getAttribute('aria-pressed')!=='true';b.setAttribute('aria-pressed',String(on));b.setAttribute('aria-label',`Número ${x.n}, ${on?'marcado':'não marcado'}`);on?marcados.add(x.n):marcados.delete(x.n);anunciar(`Número ${x.n}, ${on?'marcado':'não marcado'}.`);setTimeout(progresso,450)});grade.appendChild(b)});resultado.hidden=false;$('tituloResultado').focus();progresso()}
 botao.addEventListener('click',()=>arquivo.click());$('novaFoto').addEventListener('click',()=>arquivo.click());
-arquivo.addEventListener('change',async()=>{if(!(arquivo.files&&arquivo.files[0]))return;resultado.hidden=true;config.hidden=true;processando.hidden=false;processando.textContent='Foto recebida. Reconhecendo a cartela…';anunciar('Foto recebida. Reconhecendo a cartela. Aguarde.');try{if(!window.Tesseract)throw new Error('OCR indisponível');const r=await Tesseract.recognize(arquivo.files[0],'eng',{logger:m=>{if(m.status==='recognizing text'){const p=Math.round((m.progress||0)*100);processando.textContent=`Reconhecendo a cartela: ${p}%`}}});const texto=r.data.text||'';numeros=extrairNumeros(texto);if(numeros.length<10){const quaseVazio=texto.trim().length<8;throw new Error(quaseVazio?'Não encontrei números. Verifique se a cartela está com a frente voltada para cima e tente novamente.':'Não consegui reconhecer números suficientes. Enquadre a cartela inteira, mantenha o celular parado e tente novamente.')}centroLivre=detectarCentroLivre(texto,numeros);abrirConfig()}catch(e){processando.textContent=e.message||'Não consegui reconhecer a cartela. Tente novamente.';botao.hidden=false;botao.textContent='Fotografar novamente';anunciar(processando.textContent)}finally{arquivo.value=''}});
+arquivo.addEventListener('change',async()=>{if(!(arquivo.files&&arquivo.files[0]))return;resultado.hidden=true;config.hidden=true;processando.hidden=false;processando.textContent='Foto recebida. Preparando a leitura…';anunciar('Foto recebida. Preparando o reconhecimento da cartela. Aguarde.');try{if(!window.Tesseract)throw new Error('OCR indisponível');const canvas=await prepararImagem(arquivo.files[0]);const worker=await carregarOCR();const r=await worker.recognize(canvas,{}, {blocks:true,text:true});const words=dadosPalavras(r.data);const leitura=validarLeitura(mapearGrade(words));if(!leitura.ok)throw new Error(leitura.msg);numeros=leitura.numeros;centroLivre=leitura.centroLivre;processando.textContent=`Cartela reconhecida: ${numeros.length} números${centroLivre?' e casa central livre':''}.`;abrirConfig()}catch(e){processando.textContent=e.message||'Não consegui reconhecer a cartela. Tente novamente.';botao.hidden=false;botao.textContent='Fotografar novamente';anunciar(processando.textContent)}finally{arquivo.value=''}});
 </script></body></html>
