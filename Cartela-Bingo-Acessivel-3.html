@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b0f0d">
+<title>Cartela de Bingo Acessível</title>
+<style>
+:root{color-scheme:dark;--bg:#090c0b;--surface:#111714;--surface2:#17201b;--text:#e4e8eb;--muted:#c2c9cd;--green:#4faf72;--green2:#91c9a5;--ink:#07110b;--line:#536158;--focus:#f2d675;--danger:#ffb4ab}
+*{box-sizing:border-box}html{font-size:100%}body{margin:0;min-height:100dvh;background:radial-gradient(circle at 50% 0,#18241d 0,#0d120f 36%,var(--bg) 72%);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;-webkit-text-size-adjust:100%}
+main{min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:max(24px,env(safe-area-inset-top)) 20px max(24px,env(safe-area-inset-bottom))}.app{width:min(100%,560px)}
+.brand{display:flex;align-items:center;gap:12px;margin:0 0 28px}.mark{width:48px;height:48px;border-radius:15px;background:var(--green);display:grid;place-items:center;color:var(--ink);font-weight:950;font-size:1.45rem}.brandText{font-size:1.05rem;font-weight:650;color:var(--green2)}
+.card{background:linear-gradient(180deg,var(--surface2),var(--surface));border:1px solid var(--line);border-radius:30px;padding:clamp(26px,7vw,38px);box-shadow:0 24px 70px #0009}.kicker{margin:0 0 14px;color:#d1d6d9;font-size:1.2rem;font-weight:600}h1{font-size:clamp(2.15rem,10vw,3.5rem);line-height:1.02;letter-spacing:-.035em;margin:0 0 22px;max-width:11ch}h2{font-size:1.65rem;margin:0 0 12px}.lead,.help{font-size:1.08rem;line-height:1.55;color:var(--muted);margin:0 0 24px}
+button,.button{font:inherit}.action,.secondary{width:100%;min-height:60px;border-radius:18px;font-size:1.1rem;font-weight:750;padding:15px 18px;cursor:pointer}.action{border:2px solid var(--green);background:var(--green);color:var(--ink)}.secondary{border:2px solid var(--green);background:transparent;color:var(--green2);margin-top:14px}.action:focus-visible,.secondary:focus-visible,.num:focus-visible,input:focus-visible{outline:4px solid var(--focus);outline-offset:4px}
+.processing,.progress{margin-top:20px;padding:16px 18px;border:1px solid var(--line);border-radius:16px;line-height:1.5}.progress strong{display:block;font-size:1.2rem}.config{margin-top:24px}.group{border:1px solid var(--line);border-radius:18px;padding:18px;margin:0 0 18px}.group legend{font-weight:750;padding:0 7px}.option{display:flex;gap:12px;align-items:flex-start;padding:9px 0;font-size:1.06rem}.option input{width:22px;height:22px;flex:none}.conditional[hidden]{display:none}.error{color:var(--danger);font-weight:650;margin:8px 0 0}
+.gridWrap{overflow-x:auto}.grid{display:grid;grid-template-columns:repeat(5,minmax(52px,1fr));gap:9px}.num{min-height:58px;border:2px solid #68786e;border-radius:14px;background:#17201b;color:var(--text);font:inherit;font-size:1.25rem;font-weight:700}.num[aria-pressed="true"]{background:var(--green);border-color:var(--green);color:var(--ink)}.free{display:grid;place-items:center;min-height:58px;border:2px dashed #7d8b82;border-radius:14px;font-weight:750;color:var(--green2)}
+.sr{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}input[type=file]{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none}
+@media(max-width:380px){main{padding-left:14px;padding-right:14px}.card{border-radius:24px}.brand{margin-bottom:20px}}@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}@media(forced-colors:active){.card,.action,.mark,.num{border:2px solid ButtonText}}
+</style>
+</head>
+<body><main><div class="app">
+<div class="brand"><div class="mark" aria-hidden="true">B</div><div class="brandText">BINGO ACESSÍVEL</div></div>
+<section class="card" aria-labelledby="titulo">
+<p class="kicker">Sua cartela, do seu jeito.</p><h1 id="titulo">Cartela de Bingo Acessível</h1>
+<p class="lead" id="intro">Fotografe sua cartela impressa e transforme-a em uma cartela digital acessível.</p>
+<button class="action" id="foto" type="button">Fotografar minha cartela</button>
+<input id="arquivo" type="file" accept="image/*" capture="environment" aria-label="Fotografar ou selecionar uma cartela de bingo">
+<div id="processando" class="processing" role="status" aria-live="polite" hidden></div>
+
+<section id="config" class="config" aria-labelledby="tituloConfig" hidden>
+<h2 id="tituloConfig" tabindex="-1">Configurar partida</h2><p class="help">Antes de começar, informe somente as regras desta partida.</p>
+<fieldset class="group"><legend>Premiação da partida</legend>
+<label class="option"><input type="radio" name="premio" value="quina-cheia"> Quina e cartela cheia</label>
+<label class="option"><input type="radio" name="premio" value="cheia"> Somente cartela cheia</label></fieldset>
+<div id="quinaConfig" class="conditional" hidden>
+<fieldset class="group"><legend>Como vale a quina nesta partida?</legend><p class="help">Escolha uma ou mais opções.</p>
+<label class="option"><input type="checkbox" name="linha" value="horizontal"> Horizontal</label>
+<label class="option"><input type="checkbox" name="linha" value="vertical"> Vertical</label>
+<label class="option"><input type="checkbox" name="linha" value="diagonal"> Diagonal</label>
+<label class="option"><input type="checkbox" id="todasLinhas"> Todas as opções</label></fieldset>
+<fieldset id="centroConfig" class="group" hidden><legend>A casa central livre conta para formar uma quina?</legend>
+<label class="option"><input type="radio" name="centroConta" value="sim"> Sim</label><label class="option"><input type="radio" name="centroConta" value="nao"> Não</label></fieldset>
+</div>
+<p id="erroConfig" class="error" role="alert" hidden></p><button class="action" id="comecar" type="button">Começar partida</button>
+</section>
+
+<section id="resultado" aria-labelledby="tituloResultado" hidden><h2 id="tituloResultado" tabindex="-1">Sua cartela digital</h2>
+<div id="progresso" class="progress" aria-live="polite"><strong id="contagem">Marcados: 0. Restam: 0.</strong><span id="meta"></span></div>
+<p class="help">Toque em um número para marcar ou desmarcar.</p><div class="gridWrap"><div id="grade" class="grid"></div></div>
+<button id="novaFoto" class="secondary" type="button">Fotografar outra cartela</button></section>
+<div id="status" class="sr" role="status" aria-live="polite" aria-atomic="true"></div>
+</section></div></main>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<script>
+const $=id=>document.getElementById(id), botao=$('foto'),arquivo=$('arquivo'),status=$('status'),processando=$('processando'),config=$('config'),resultado=$('resultado'),grade=$('grade');
+let numeros=[], centroLivre=false, marcados=new Set(), quinaAnunciada=false, partida={premio:'',linhas:[],centroConta:false};
+function anunciar(msg){status.textContent='';setTimeout(()=>status.textContent=msg,40)}
+function extrairNumeros(t){const v=(t.match(/\b(?:[1-9]|[1-6]\d|7[0-5])\b/g)||[]).map(Number),u=[];for(const n of v)if(!u.includes(n))u.push(n);return u.slice(0,25)}
+function detectarCentroLivre(texto,nums){return /\b(FREE|LIVRE)\b/i.test(texto)||nums.length===24}
+function beep(vezes=1,freq=620,dur=.09){try{const C=window.AudioContext||window.webkitAudioContext,ctx=new C();for(let i=0;i<vezes;i++){const o=ctx.createOscillator(),g=ctx.createGain();o.frequency.value=freq;o.connect(g);g.connect(ctx.destination);const t=ctx.currentTime+i*.16;g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.16,t+.015);g.gain.exponentialRampToValueAtTime(.0001,t+dur);o.start(t);o.stop(t+dur+.02)}setTimeout(()=>ctx.close(),1000)}catch(e){}}
+function somQuina(){beep(2,880,.14)} function somCompleto(){beep(3,1040,.18)}
+function abrirConfig(){processando.hidden=true;botao.hidden=true;$('intro').hidden=true;config.hidden=false;$('tituloConfig').focus();anunciar('Cartela reconhecida. Configure a partida.')}
+function atualizarCondicionais(){const p=document.querySelector('input[name=premio]:checked')?.value;$('quinaConfig').hidden=p!=='quina-cheia';$('centroConfig').hidden=!(p==='quina-cheia'&&centroLivre)}
+document.querySelectorAll('input[name=premio]').forEach(x=>x.addEventListener('change',atualizarCondicionais));
+$('todasLinhas').addEventListener('change',e=>document.querySelectorAll('input[name=linha]').forEach(x=>x.checked=e.target.checked));
+document.querySelectorAll('input[name=linha]').forEach(x=>x.addEventListener('change',()=>{$('todasLinhas').checked=[...document.querySelectorAll('input[name=linha]')].every(y=>y.checked)}));
+function validarConfig(){const premio=document.querySelector('input[name=premio]:checked')?.value;if(!premio)return 'Escolha a premiação da partida.';const linhas=[...document.querySelectorAll('input[name=linha]:checked')].map(x=>x.value);if(premio==='quina-cheia'&&!linhas.length)return 'Selecione pelo menos uma forma válida de quina.';let centroConta=false;if(premio==='quina-cheia'&&centroLivre){const c=document.querySelector('input[name=centroConta]:checked')?.value;if(!c)return 'Informe se a casa central livre conta para formar uma quina.';centroConta=c==='sim'}partida={premio,linhas,centroConta};return ''}
+$('comecar').addEventListener('click',()=>{const e=validarConfig();$('erroConfig').hidden=!e;$('erroConfig').textContent=e;if(e){anunciar(e);return}config.hidden=true;montarCartela();});
+function casas(){const a=[];let ni=0;for(let i=0;i<25;i++){if(centroLivre&&i===12)a.push({livre:true});else a.push({n:numeros[ni++]})}return a}
+function linhasValidas(cs){const L=[];if(partida.linhas.includes('horizontal'))for(let r=0;r<5;r++)L.push([0,1,2,3,4].map(c=>r*5+c));if(partida.linhas.includes('vertical'))for(let c=0;c<5;c++)L.push([0,1,2,3,4].map(r=>r*5+c));if(partida.linhas.includes('diagonal')){L.push([0,6,12,18,24]);L.push([4,8,12,16,20])}return L.filter(ix=>ix.every(i=>{const x=cs[i];return x.livre?partida.centroConta:marcados.has(x.n)}))}
+function progresso(){const total=numeros.length, m=marcados.size, faltam=total-m;$('contagem').textContent=`Marcados: ${m}. Restam: ${faltam}.`;$('meta').textContent=partida.premio==='quina-cheia'?(quinaAnunciada?' Quina concluída; partida continua para cartela cheia.':' Objetivo atual: quina.'):' Objetivo: cartela cheia.';if(partida.premio==='quina-cheia'&&!quinaAnunciada&&linhasValidas(casas()).length){quinaAnunciada=true;somQuina();anunciar('Quina completa. A partida continua para cartela cheia.');return}if(faltam===0){somCompleto();anunciar('Cartela completa. Confira o resultado.');return}if(faltam<=3){beep(faltam);anunciar(`Faltam ${faltam} ${faltam===1?'número':'números'} para completar a cartela.`)}}
+function montarCartela(){grade.innerHTML='';marcados.clear();quinaAnunciada=false;const cs=casas();cs.forEach((x,i)=>{if(x.livre){const d=document.createElement('div');d.className='free';d.textContent='LIVRE';d.setAttribute('aria-label','Casa central livre');grade.appendChild(d);return}const b=document.createElement('button');b.type='button';b.className='num';b.textContent=x.n;b.setAttribute('aria-pressed','false');b.setAttribute('aria-label',`Número ${x.n}, não marcado`);b.addEventListener('click',()=>{const on=b.getAttribute('aria-pressed')!=='true';b.setAttribute('aria-pressed',String(on));b.setAttribute('aria-label',`Número ${x.n}, ${on?'marcado':'não marcado'}`);on?marcados.add(x.n):marcados.delete(x.n);anunciar(`Número ${x.n}, ${on?'marcado':'não marcado'}.`);setTimeout(progresso,450)});grade.appendChild(b)});resultado.hidden=false;$('tituloResultado').focus();progresso()}
+botao.addEventListener('click',()=>arquivo.click());$('novaFoto').addEventListener('click',()=>arquivo.click());
+arquivo.addEventListener('change',async()=>{if(!(arquivo.files&&arquivo.files[0]))return;resultado.hidden=true;config.hidden=true;processando.hidden=false;processando.textContent='Foto recebida. Reconhecendo a cartela…';anunciar('Foto recebida. Reconhecendo a cartela. Aguarde.');try{if(!window.Tesseract)throw new Error('OCR indisponível');const r=await Tesseract.recognize(arquivo.files[0],'eng',{logger:m=>{if(m.status==='recognizing text'){const p=Math.round((m.progress||0)*100);processando.textContent=`Reconhecendo a cartela: ${p}%`}}});const texto=r.data.text||'';numeros=extrairNumeros(texto);if(numeros.length<10){const quaseVazio=texto.trim().length<8;throw new Error(quaseVazio?'Não encontrei números. Verifique se a cartela está com a frente voltada para cima e tente novamente.':'Não consegui reconhecer números suficientes. Enquadre a cartela inteira, mantenha o celular parado e tente novamente.')}centroLivre=detectarCentroLivre(texto,numeros);abrirConfig()}catch(e){processando.textContent=e.message||'Não consegui reconhecer a cartela. Tente novamente.';botao.hidden=false;botao.textContent='Fotografar novamente';anunciar(processando.textContent)}finally{arquivo.value=''}});
+</script></body></html>
