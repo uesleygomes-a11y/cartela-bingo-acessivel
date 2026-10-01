@@ -7,13 +7,13 @@
 <title>Cartela de Bingo Acessível</title>
 <style>
 :root{color-scheme:dark;--bg:#090c0b;--surface:#111714;--surface2:#17201b;--text:#e4e8eb;--muted:#c2c9cd;--green:#4faf72;--green2:#91c9a5;--ink:#07110b;--line:#536158;--focus:#f2d675;--danger:#ffb4ab}
-*{box-sizing:border-box}html{font-size:100%}body{margin:0;min-height:100dvh;background:radial-gradient(circle at 50% 0,#18241d 0,#0d120f 36%,var(--bg) 72%);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;-webkit-text-size-adjust:100%}
+*{box-sizing:border-box}h1,h2,.help,.lead,.action,.secondary,.free,.option{overflow-wrap:anywhere}.free{min-width:0}html{font-size:100%}body{margin:0;min-height:100dvh;background:radial-gradient(circle at 50% 0,#18241d 0,#0d120f 36%,var(--bg) 72%);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;-webkit-text-size-adjust:100%}
 main{min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:max(24px,env(safe-area-inset-top)) 20px max(24px,env(safe-area-inset-bottom))}.app{width:min(100%,560px)}
 .brand{display:flex;align-items:center;gap:12px;margin:0 0 28px}.mark{width:48px;height:48px;border-radius:15px;background:var(--green);display:grid;place-items:center;color:var(--ink);font-weight:950;font-size:1.45rem}.brandText{font-size:1.05rem;font-weight:650;color:var(--green2)}
 .card{background:linear-gradient(180deg,var(--surface2),var(--surface));border:1px solid var(--line);border-radius:30px;padding:clamp(26px,7vw,38px);box-shadow:0 24px 70px #0009}.kicker{margin:0 0 14px;color:#d1d6d9;font-size:1.2rem;font-weight:600}h1{font-size:clamp(2.15rem,10vw,3.5rem);line-height:1.02;letter-spacing:-.035em;margin:0 0 22px;max-width:11ch}h2{font-size:1.65rem;margin:0 0 12px}.lead,.help{font-size:1.08rem;line-height:1.55;color:var(--muted);margin:0 0 24px}
 button,.button{font:inherit}.action,.secondary{width:100%;min-height:60px;border-radius:18px;font-size:1.1rem;font-weight:750;padding:15px 18px;cursor:pointer}.action{border:2px solid var(--green);background:var(--green);color:var(--ink)}.secondary{border:2px solid var(--green);background:transparent;color:var(--green2);margin-top:14px}.action:focus-visible,.secondary:focus-visible,.num:focus-visible,input:focus-visible{outline:4px solid var(--focus);outline-offset:4px}
-.processing,.progress{margin-top:20px;padding:16px 18px;border:1px solid var(--line);border-radius:16px;line-height:1.5}.progress strong{display:block;font-size:1.2rem}.config{margin-top:24px}.group{border:1px solid var(--line);border-radius:18px;padding:18px;margin:0 0 18px}.group legend{font-weight:750;padding:0 7px}.option{display:flex;gap:12px;align-items:flex-start;padding:9px 0;font-size:1.06rem}.option input{width:22px;height:22px;flex:none}.conditional[hidden]{display:none}.error{color:var(--danger);font-weight:650;margin:8px 0 0}
-.gridWrap{overflow-x:auto}.grid{display:grid;grid-template-columns:repeat(5,minmax(52px,1fr));gap:9px}.num{min-height:58px;border:2px solid #68786e;border-radius:14px;background:#17201b;color:var(--text);font:inherit;font-size:1.25rem;font-weight:700}.num[aria-pressed="true"]{background:var(--green);border-color:var(--green);color:var(--ink)}.free{display:grid;place-items:center;min-height:58px;border:2px dashed #7d8b82;border-radius:14px;font-weight:750;color:var(--green2)}
+.processing,.progress{margin-top:20px;padding:16px 18px;border:1px solid var(--line);border-radius:16px;line-height:1.5}.progress strong{display:block;font-size:1.2rem}.config{margin-top:24px}.group{border:1px solid var(--line);border-radius:18px;padding:18px;margin:0 0 18px}.group legend{font-weight:750;padding:0 7px}.option{display:flex;gap:12px;align-items:flex-start;padding:9px 0;font-size:1.06rem}.option input{width:24px;height:24px;flex:none}.conditional[hidden]{display:none}.error{color:var(--danger);font-weight:650;margin:8px 0 0}
+.gridWrap{overflow-x:auto}.grid{display:grid;grid-template-columns:repeat(5,minmax(max(44px,4ch),1fr));gap:5px}.card{min-width:0}.num{min-width:0;padding:4px;white-space:nowrap}.gridWrap:focus-visible{outline:3px solid var(--focus);outline-offset:3px}button:disabled{opacity:.65}h2:focus{outline:3px solid var(--focus)}.num{min-height:58px;border:2px solid #68786e;border-radius:14px;background:#17201b;color:var(--text);font:inherit;font-size:1.25rem;font-weight:700}.num[aria-pressed="true"]{background:var(--green);border-color:var(--green);color:var(--ink)}.num[aria-pressed="true"]::after{content:" ✓"}.free{display:grid;place-items:center;min-height:58px;border:2px dashed #7d8b82;border-radius:14px;font-weight:750;color:var(--green2)}
 .sr{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}input[type=file]{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none}
 @media(max-width:380px){main{padding-left:14px;padding-right:14px}.card{border-radius:24px}.brand{margin-bottom:20px}}@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}@media(forced-colors:active){.card,.action,.mark,.num{border:2px solid ButtonText}}
 </style>
@@ -24,8 +24,8 @@ button,.button{font:inherit}.action,.secondary{width:100%;min-height:60px;border
 <p class="kicker">Sua cartela, do seu jeito.</p><h1 id="titulo">Cartela de Bingo Acessível</h1>
 <p class="lead" id="intro">Fotografe sua cartela impressa e transforme-a em uma cartela digital acessível.</p>
 <button class="action" id="foto" type="button">Fotografar minha cartela</button>
-<input id="arquivo" type="file" accept="image/*" capture="environment" aria-label="Fotografar ou selecionar uma cartela de bingo">
-<div id="processando" class="processing" role="status" aria-live="polite" hidden></div>
+<input tabindex="-1" id="arquivo" type="file" accept="image/*" capture="environment" aria-label="Fotografar ou selecionar uma cartela de bingo">
+<div id="processando" class="processing" tabindex="-1" hidden></div>
 
 <section id="config" class="config" aria-labelledby="tituloConfig" hidden>
 <h2 id="tituloConfig" tabindex="-1">Configurar partida</h2><p class="help">Antes de começar, informe somente as regras desta partida.</p>
@@ -45,75 +45,23 @@ button,.button{font:inherit}.action,.secondary{width:100%;min-height:60px;border
 </section>
 
 <section id="resultado" aria-labelledby="tituloResultado" hidden><h2 id="tituloResultado" tabindex="-1">Sua cartela digital</h2>
-<div id="progresso" class="progress" aria-live="polite"><strong id="contagem">Marcados: 0. Restam: 0.</strong><span id="meta"></span></div>
-<p class="help">Toque em um número para marcar ou desmarcar.</p><div class="gridWrap"><div id="grade" class="grid"></div></div>
+<div id="progresso" class="progress"><strong id="contagem">Marcados: 0. Restam: 0.</strong><span id="meta"></span></div>
+<p class="help">Toque em um número para marcar ou desmarcar.</p><div class="gridWrap" tabindex="0" role="region" aria-label="Cartela com cinco linhas e cinco colunas. Com texto ampliado, esta região permite rolagem horizontal."><div id="grade" class="grid"></div></div>
 <button id="novaFoto" class="secondary" type="button">Fotografar outra cartela</button></section>
 <div id="status" class="sr" role="status" aria-live="polite" aria-atomic="true"></div>
 </section></div></main>
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<script src="vendor/opencv.js"></script>
+<script src="vendor/tesseract.min.js"></script>
+<script src="vision.js"></script>
 <script>
 const $=id=>document.getElementById(id), botao=$('foto'),arquivo=$('arquivo'),status=$('status'),processando=$('processando'),config=$('config'),resultado=$('resultado'),grade=$('grade');
 let numeros=[], centroLivre=false, marcados=new Set(), quinaAnunciada=false, partida={premio:'',linhas:[],centroConta:false};
 function anunciar(msg){status.textContent='';setTimeout(()=>status.textContent=msg,40)}
 function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
-let ocrWorker=null;
-async function carregarOCR(){
-  if(ocrWorker)return ocrWorker;
-  processando.textContent='Preparando o reconhecimento pela primeira vez…';
-  ocrWorker=await Tesseract.createWorker('eng',1,{logger:m=>{
-    if(m.status==='recognizing text'){
-      const p=Math.round((m.progress||0)*100);
-      processando.textContent=`Reconhecendo a cartela: ${p}%`;
-    }
-  }});
-  await ocrWorker.setParameters({
-    tessedit_char_whitelist:'0123456789',
-    tessedit_pageseg_mode:'6',
-    preserve_interword_spaces:'1'
-  });
-  return ocrWorker;
-}
 async function prepararImagem(file){
-  const bmp=await createImageBitmap(file);
-  const max=1600, scale=Math.min(1,max/Math.max(bmp.width,bmp.height));
-  const w=Math.max(1,Math.round(bmp.width*scale)),h=Math.max(1,Math.round(bmp.height*scale));
-  const c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d',{willReadFrequently:true});
-  x.drawImage(bmp,0,0,w,h);bmp.close?.();
-  const im=x.getImageData(0,0,w,h),d=im.data,hist=new Uint32Array(256);let total=w*h,sum=0;
-  for(let i=0;i<d.length;i+=4){const g=Math.round(.299*d[i]+.587*d[i+1]+.114*d[i+2]);hist[g]++;sum+=g}
-  let sumB=0,wB=0,maxVar=0,thr=150;
-  for(let t=0;t<256;t++){wB+=hist[t];if(!wB)continue;const wF=total-wB;if(!wF)break;sumB+=t*hist[t];const mB=sumB/wB,mF=(sum-sumB)/wF,v=wB*wF*(mB-mF)*(mB-mF);if(v>maxVar){maxVar=v;thr=t}}
-  thr=clamp(thr,85,205);
-  for(let i=0;i<d.length;i+=4){const g=Math.round(.299*d[i]+.587*d[i+1]+.114*d[i+2]);const v=g<thr?0:255;d[i]=d[i+1]=d[i+2]=v;d[i+3]=255}
-  x.putImageData(im,0,0);return c;
-}
-function numeroValido(s){const m=String(s||'').match(/\d{1,3}/);if(!m)return null;const n=Number(m[0]);return n>=1&&n<=100?n:null}
-function dadosPalavras(data){
-  const ws=data.words||data.blocks?.flatMap(b=>b.paragraphs||[]).flatMap(p=>p.lines||[]).flatMap(l=>l.words||[])||[];
-  return ws.map(w=>({n:numeroValido(w.text),conf:Number(w.confidence??w.conf??0),box:w.bbox})).filter(w=>w.n&&w.box&&w.conf>=20);
-}
-function agrupar5(vals){
-  if(!vals.length)return null;const a=[...vals].sort((x,y)=>x-y),groups=[];
-  for(const v of a){let g=groups.find(z=>Math.abs(z.mean-v)<z.tol);if(!g){g={items:[],mean:v,tol:Math.max(18,(a[a.length-1]-a[0])/12)};groups.push(g)}g.items.push(v);g.mean=g.items.reduce((q,n)=>q+n,0)/g.items.length}
-  while(groups.length>5){let bi=0,bd=Infinity;for(let i=0;i<groups.length-1;i++){const d=groups[i+1].mean-groups[i].mean;if(d<bd){bd=d;bi=i}}const m=groups.splice(bi,2);groups.splice(bi,0,{items:[...m[0].items,...m[1].items],mean:(m[0].mean+m[1].mean)/2,tol:Math.max(m[0].tol,m[1].tol)})}
-  return groups.sort((x,y)=>x.mean-y.mean).map(g=>g.mean);
-}
-function mapearGrade(words){
-  if(words.length<20)return null;
-  const xs=words.map(w=>(w.box.x0+w.box.x1)/2),ys=words.map(w=>(w.box.y0+w.box.y1)/2),cols=agrupar5(xs),rows=agrupar5(ys);
-  if(!cols||!rows||cols.length!==5||rows.length!==5)return null;
-  const cells=Array(25).fill(null),confidence=Array(25).fill(0);
-  const near=(arr,v)=>arr.reduce((best,x,i)=>Math.abs(x-v)<best.d?{i,d:Math.abs(x-v)}:best,{i:0,d:Infinity}).i;
-  for(const w of words){const cx=(w.box.x0+w.box.x1)/2,cy=(w.box.y0+w.box.y1)/2,c=near(cols,cx),r=near(rows,cy),i=r*5+c;if(w.conf>confidence[i]){cells[i]=w.n;confidence[i]=w.conf}}
-  return {cells,confidence};
-}
-function validarLeitura(mapped){
-  if(!mapped)return {ok:false,msg:'Não consegui localizar com segurança a grade 5 por 5. Fotografe a cartela inteira, de frente, evitando inclinação.'};
-  const c=mapped.cells,externas=c.filter((_,i)=>i!==12),faltas=externas.filter(n=>!n).length;
-  if(faltas)return {ok:false,msg:`Não consegui ler ${faltas} ${faltas===1?'casa':'casas'} da cartela. A leitura não será aceita para evitar números errados. Tente outra foto.`};
-  const nums=externas.slice();let livre=!c[12];if(!livre)nums.splice(12,0,c[12]);
-  if(new Set(nums).size!==nums.length)return {ok:false,msg:'Encontrei números repetidos na leitura. Para evitar uma cartela incorreta, fotografe novamente.'};
-  return {ok:true,numeros:nums,centroLivre:livre};
+ const bmp=await createImageBitmap(file);const scale=Math.min(1,1600/Math.max(bmp.width,bmp.height));
+ const c=document.createElement('canvas');c.width=Math.round(bmp.width*scale);c.height=Math.round(bmp.height*scale);
+ c.getContext('2d').drawImage(bmp,0,0,c.width,c.height);bmp.close();return c;
 }
 function beep(vezes=1,freq=620,dur=.09){try{const C=window.AudioContext||window.webkitAudioContext,ctx=new C();for(let i=0;i<vezes;i++){const o=ctx.createOscillator(),g=ctx.createGain();o.frequency.value=freq;o.connect(g);g.connect(ctx.destination);const t=ctx.currentTime+i*.16;g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.16,t+.015);g.gain.exponentialRampToValueAtTime(.0001,t+dur);o.start(t);o.stop(t+dur+.02)}setTimeout(()=>ctx.close(),1000)}catch(e){}}
 function somQuina(){beep(2,880,.14)} function somCompleto(){beep(3,1040,.18)}
@@ -127,7 +75,7 @@ $('comecar').addEventListener('click',()=>{const e=validarConfig();$('erroConfig
 function casas(){const a=[];let ni=0;for(let i=0;i<25;i++){if(centroLivre&&i===12)a.push({livre:true});else a.push({n:numeros[ni++]})}return a}
 function linhasValidas(cs){const L=[];if(partida.linhas.includes('horizontal'))for(let r=0;r<5;r++)L.push([0,1,2,3,4].map(c=>r*5+c));if(partida.linhas.includes('vertical'))for(let c=0;c<5;c++)L.push([0,1,2,3,4].map(r=>r*5+c));if(partida.linhas.includes('diagonal')){L.push([0,6,12,18,24]);L.push([4,8,12,16,20])}return L.filter(ix=>ix.every(i=>{const x=cs[i];return x.livre?partida.centroConta:marcados.has(x.n)}))}
 function progresso(){const total=numeros.length, m=marcados.size, faltam=total-m;$('contagem').textContent=`Marcados: ${m}. Restam: ${faltam}.`;$('meta').textContent=partida.premio==='quina-cheia'?(quinaAnunciada?' Quina concluída; partida continua para cartela cheia.':' Objetivo atual: quina.'):' Objetivo: cartela cheia.';if(partida.premio==='quina-cheia'&&!quinaAnunciada&&linhasValidas(casas()).length){quinaAnunciada=true;somQuina();anunciar('Quina completa. A partida continua para cartela cheia.');return}if(faltam===0){somCompleto();anunciar('Cartela completa. Confira o resultado.');return}if(faltam<=3){beep(faltam);anunciar(`Faltam ${faltam} ${faltam===1?'número':'números'} para completar a cartela.`)}}
-function montarCartela(){grade.innerHTML='';marcados.clear();quinaAnunciada=false;const cs=casas();cs.forEach((x,i)=>{if(x.livre){const d=document.createElement('div');d.className='free';d.textContent='LIVRE';d.setAttribute('aria-label','Casa central livre');grade.appendChild(d);return}const b=document.createElement('button');b.type='button';b.className='num';b.textContent=x.n;b.setAttribute('aria-pressed','false');b.setAttribute('aria-label',`Número ${x.n}, não marcado`);b.addEventListener('click',()=>{const on=b.getAttribute('aria-pressed')!=='true';b.setAttribute('aria-pressed',String(on));b.setAttribute('aria-label',`Número ${x.n}, ${on?'marcado':'não marcado'}`);on?marcados.add(x.n):marcados.delete(x.n);anunciar(`Número ${x.n}, ${on?'marcado':'não marcado'}.`);setTimeout(progresso,450)});grade.appendChild(b)});resultado.hidden=false;$('tituloResultado').focus();progresso()}
-botao.addEventListener('click',()=>arquivo.click());$('novaFoto').addEventListener('click',()=>arquivo.click());
-arquivo.addEventListener('change',async()=>{if(!(arquivo.files&&arquivo.files[0]))return;resultado.hidden=true;config.hidden=true;processando.hidden=false;processando.textContent='Foto recebida. Preparando a leitura…';anunciar('Foto recebida. Preparando o reconhecimento da cartela. Aguarde.');try{if(!window.Tesseract)throw new Error('OCR indisponível');const canvas=await prepararImagem(arquivo.files[0]);const worker=await carregarOCR();const r=await worker.recognize(canvas,{}, {blocks:true,text:true});const words=dadosPalavras(r.data);const leitura=validarLeitura(mapearGrade(words));if(!leitura.ok)throw new Error(leitura.msg);numeros=leitura.numeros;centroLivre=leitura.centroLivre;processando.textContent=`Cartela reconhecida: ${numeros.length} números${centroLivre?' e casa central livre':''}.`;abrirConfig()}catch(e){processando.textContent=e.message||'Não consegui reconhecer a cartela. Tente novamente.';botao.hidden=false;botao.textContent='Fotografar novamente';anunciar(processando.textContent)}finally{arquivo.value=''}});
+function montarCartela(){grade.innerHTML='';marcados.clear();quinaAnunciada=false;const cs=casas();cs.forEach((x,i)=>{if(x.livre){const d=document.createElement('div');d.className='free';d.textContent='LIVRE';d.setAttribute('role','img');d.setAttribute('aria-label','Casa central livre');grade.appendChild(d);return}const b=document.createElement('button');b.type='button';b.className='num';b.textContent=x.n;b.setAttribute('aria-pressed','false');b.setAttribute('aria-label',`Número ${x.n}, linha ${Math.floor(i/5)+1}, coluna ${i%5+1}`);b.addEventListener('click',()=>{const on=b.getAttribute('aria-pressed')!=='true';b.setAttribute('aria-pressed',String(on));b.setAttribute('aria-label',`Número ${x.n}, linha ${Math.floor(i/5)+1}, coluna ${i%5+1}`);on?marcados.add(x.n):marcados.delete(x.n);anunciar(`Número ${x.n}, ${on?'marcado':'não marcado'}.`);setTimeout(progresso,450)});grade.appendChild(b)});resultado.hidden=false;$('tituloResultado').focus();progresso()}
+botao.addEventListener('click',()=>arquivo.click());$('novaFoto').addEventListener('click',()=>{if(marcados.size&&!confirm('Fotografar outra cartela? Sua partida atual será substituída somente se a nova leitura for aceita.'))return;arquivo.click()});
+arquivo.addEventListener('change',async()=>{if(!(arquivo.files&&arquivo.files[0]))return;botao.disabled=true;$('novaFoto').disabled=true;processando.hidden=false;processando.textContent='Foto recebida. Preparando a leitura…';anunciar('Foto recebida. Preparando o reconhecimento da cartela. Aguarde.');try{if(!window.Tesseract)throw new Error('OCR indisponível');const canvas=await prepararImagem(arquivo.files[0]);const leitura=await BingoVision.read(canvas,msg=>{processando.textContent=msg;anunciar(msg)});numeros=leitura.numeros;centroLivre=leitura.centroLivre;processando.textContent=`Cartela reconhecida: ${numeros.length} números${centroLivre?' e casa central livre':''}.`;resultado.hidden=true;abrirConfig()}catch(e){processando.textContent=e.message||'Não consegui reconhecer a cartela. Tente novamente.';botao.hidden=false;botao.textContent='Fotografar novamente';anunciar(processando.textContent)}finally{botao.disabled=false;$('novaFoto').disabled=false;arquivo.value='';if(!processando.hidden)botao.focus()}});
 </script></body></html>
