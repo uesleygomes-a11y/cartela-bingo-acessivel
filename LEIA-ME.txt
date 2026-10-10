@@ -1,0 +1,21 @@
+CARTELA DE BINGO ACESSÍVEL — PACOTE DE CORREÇÃO
+
+ARQUIVOS:
+- index.html: substitua o index.html do repositório GitHub.
+- worker.js: código de referência para o Worker Cloudflare; só substitua o código atual após comparar e confirmar que o binding AI existe.
+- wrangler.jsonc: configuração de referência para publicação do Worker; não é necessário subir este arquivo no GitHub Pages.
+
+COMO TESTAR:
+1. Atualize o index.html no GitHub e aguarde o GitHub Pages publicar.
+2. Abra a página no navegador. Expanda "Configurar conexão com reconhecimento por IA".
+3. Cole o endereço HTTPS público do seu Worker (workers.dev) e toque em Salvar endereço.
+4. Toque em Testar conexão. Precisa responder /health com {"ok":true,"aiConfigured":true}.
+5. Fotografe uma cartela e toque em "OK, reconhecer cartela".
+
+CONTRATO DE API:
+GET /health -> {"ok":true,"aiConfigured":true}
+POST /recognize multipart/form-data, campo image -> {"grid":[[...],[...],[...],[...],[...]]}
+
+IMPORTANTE: O frontend foi escrito para o Worker de referência neste pacote. Se o Worker atual tiver rotas diferentes, o frontend não funcionará sem compatibilizá-las. O código não foi testado contra sua conta Cloudflare nem com fotografias reais; o modelo de visão pode precisar de ajustes conforme disponibilidade na conta. Não substitua cegamente um Worker que já funciona.
+
+Esta versão cobre captura, envio, validação da grade e marcação acessível. NÃO inclui ainda regras de quina, padrões de vitória, alertas sonoros e outras funções avançadas do projeto anterior. Guarde cópia do index.html atual antes de substituir, para evitar perder funcionalidades.
