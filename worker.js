@@ -1,8 +1,11 @@
 // Cartela de Bingo Acessível — Uesley Gomes.
 // Mesmo contrato do frontend: GET /health; POST /recognize com FormData, campo image.
-// Corrige o envio ao modelo existente, sem recriar a arquitetura ou aceitar licenças automaticamente.
+// Usa o modelo e o vínculo AI existentes. Uesley confirmou em 10/10/2026
+// que já aceitou a licença da Meta. Registra esse aceite na conta do Worker
+// somente se o provedor informar que o registro está ausente.
 const MODEL = '@cf/meta/llama-3.2-11b-vision-instruct';
-const VERSION = 'bingo-vision-v2';
+const VERSION = 'bingo-vision-v2.1';
+const META_LICENSE_ALREADY_ACCEPTED = true;
 const MAX_IMAGE_BYTES = 8 * 1024 * 1024;
 const headers = {
   'Access-Control-Allow-Origin': '*',
@@ -12,6 +15,40 @@ const headers = {
 };
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), { status, headers: { ...headers, 'Content-Type': 'application/json; charset=utf-8' } });
+}
+function providerDiagnostic(error) {
+  const message = String(error?.message || error || 'Erro sem mensagem.').slice(0, 1200);
+  const explicitCode = Number(error?.code);
+  const messageCode = message.match(/\b(\d{4})\b/);
+  const code = Number.isInteger(explicitCode) && explicitCode >= 1000 && explicitCode <= 9999
+    ? explicitCode : messageCode ? Number(messageCode[1]) : null;
+  return { providerCode: code, providerMessage: message };
+}
+function missingLicenseRegistration(error) {
+  const detail = providerDiagnostic(error);
+  // 5016 é especificamente "Model agreement" na documentação do Workers AI.
+  // Uma menção isolada a "agree" ou "terms" não identifica essa falha.
+  return detail.providerCode === 5016 ||
+    /(?:has not|have not|haven't|not yet|must|need to)\s+(?:agreed?|accept)[\s\S]{0,200}(?:llama.?3\.?2|licen[cs]e|model terms)/i.test(detail.providerMessage);
+}
+let registrationPending = null;
+async function registerPreviouslyAcceptedLicense(ai) {
+  if (!registrationPending) {
+    registrationPending = Promise.resolve().then(() => ai.run(MODEL, { prompt: 'agree' }));
+    registrationPending.catch(() => { registrationPending = null; });
+  }
+  return registrationPending;
+}
+async function recognizeImage(ai, input) {
+  try { return await ai.run(MODEL, input); }
+  catch (error) {
+    if (!META_LICENSE_ALREADY_ACCEPTED || !missingLicenseRegistration(error)) throw error;
+    console.warn('Registrando na conta do Worker o aceite Meta já confirmado pelo responsável.');
+    await registerPreviouslyAcceptedLicense(ai);
+    // A mesma foto é reenviada uma única vez. Esse retorno, e não o texto da
+    // resposta a agree, confirma se o modelo foi efetivamente liberado.
+    return await ai.run(MODEL, input);
+  }
 }
 function extract(value) {
   if (value && typeof value === 'object' && (Array.isArray(value.grid) || typeof value.error === 'string')) return value;
@@ -69,12 +106,12 @@ export default {
     let output;
     try {
       // Workers AI espera image no nível superior, junto de prompt; não em messages[].content[].
-      output = await env.AI.run(MODEL, { prompt, image: Array.from(bytes), max_tokens: 768, temperature: 0 });
+      output = await recognizeImage(env.AI, { prompt, image: Array.from(bytes), max_tokens: 768, temperature: 0 });
     } catch (error) {
       console.error('Recognition model error', error);
-      const message = String(error?.message || '');
-      if (/license|licen[cs]e|agree|agreement|terms of use/i.test(message)) return json({ ok: false, code: 'MODEL_LICENSE_REQUIRED', error: 'O modelo de visão exige que o responsável pela conta Cloudflare aceite a licença da Meta. O aplicativo não pode concluir o reconhecimento antes disso.' }, 503);
-      return json({ ok: false, code: 'AI_UNAVAILABLE', error: 'O serviço de inteligência artificial não conseguiu processar a foto. Tente novamente mais tarde.' }, 502);
+      const diagnostic = providerDiagnostic(error);
+      if (missingLicenseRegistration(error)) return json({ ok: false, code: 'MODEL_LICENSE_REQUIRED', error: 'O Cloudflare ainda não confirmou o registro do aceite Meta na conta deste Worker. Código do serviço: ' + (diagnostic.providerCode || 'não informado') + '.', diagnostic, version: VERSION, model: MODEL }, 503);
+      return json({ ok: false, code: 'AI_UNAVAILABLE', error: 'O serviço de inteligência artificial não conseguiu processar a foto. Código do serviço: ' + (diagnostic.providerCode || 'não informado') + '.', diagnostic, version: VERSION, model: MODEL }, 502);
     }
     try {
       const parsed = extract(output);

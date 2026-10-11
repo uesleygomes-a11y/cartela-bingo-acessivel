@@ -1,0 +1,12 @@
+CORREÇÃO DA CARTELA DE BINGO ACESSÍVEL — 10/10/2026
+
+worker.js: mantém o modelo Llama 3.2 11B Vision e o vínculo AI já existentes.
+Uesley confirmou que já aceitou a licença Meta. Se o provedor retornar o erro específico 5016, registra esse aceite por env.AI.run(MODEL, { prompt: "agree" }) na conta do próprio Worker e repete o reconhecimento da mesma foto uma vez. A publicação desta versão ativa essa chamada de registro. O código mantém a validação da grade e preserva o código/mensagem do provedor quando há falha.
+
+index.html: mantém as funções existentes e leva o foco e a rolagem até o aviso de erro, em vez de deixar o aviso fora da tela.
+
+Versão do Worker: bingo-vision-v2.1.
+
+Verificado localmente: seis cenários de integração, com respostas da IA simuladas, incluindo o erro 5016, o registro na mesma vinculação e o reenvio dos bytes da foto original; erros de entrada não são confundidos com licença; uma segunda recusa não gera repetição infinita; grades incompletas continuam sendo rejeitadas.
+
+O teste real em produção ainda depende da implantação na conta Cloudflare. Nenhuma publicação foi realizada nesta etapa. Não há confirmação de reconhecimento correto por IA real nem de teste TalkBack nesta versão.
