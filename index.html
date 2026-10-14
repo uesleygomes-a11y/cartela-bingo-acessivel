@@ -152,6 +152,13 @@
       clearTimeout(announcementTimer);
       $('error').hidden = false;
       $('error').textContent = message;
+      const copy = document.createElement('button');
+      copy.type = 'button'; copy.textContent = 'Copiar diagnóstico';
+      copy.addEventListener('click', async () => {
+        try { await navigator.clipboard.writeText(message); announce('Diagnóstico copiado.'); }
+        catch { announce('Não foi possível copiar automaticamente. Selecione o texto do erro.'); }
+      });
+      $('error').append(document.createElement('p'), copy);
       $('error').focus({ preventScroll: true });
       $('error').scrollIntoView({ block: 'center', behavior: 'auto' });
     }
@@ -179,7 +186,8 @@
         if (response.status === 404) throw new Error('O serviço de reconhecimento não disponibiliza a rota ' + path + ' (HTTP 404). O código do Worker precisa ser atualizado.');
         if (!response.ok || payload?.ok === false || payload?.error) {
           const message = typeof payload?.error === 'string' ? payload.error : 'O serviço respondeu com HTTP ' + response.status + '.';
-          throw new Error(message);
+          const diagnostic = ['Etapa: ' + (payload?.stage || 'não informada'), 'Código: ' + (payload?.code || 'não informado'), 'HTTP: ' + response.status, 'Detalhe: ' + (payload?.diagnostic?.detail || 'não informado'), 'Solicitação: ' + (payload?.diagnostic?.requestId || 'não informado'), 'Worker: ' + (payload?.version || 'não informado')].join('\n');
+          throw new Error(message + '\n\nDiagnóstico técnico:\n' + diagnostic);
         }
         return payload;
       } finally { clearTimeout(timer); }
